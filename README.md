@@ -138,3 +138,7 @@ Invoices may be entered with a past due date, which supports businesses bringing
 The API reads its SQLite connection string from `ConnectionStrings__Capitec` and reminder settings from `Notifications__Enabled`, `Notifications__IntervalMinutes`, and `Notifications__WindowDays`. Scheduled processing is off by default, including in local development.
 
 This is an unauthenticated, single-workspace local demo, not a production-ready financial platform. Before any shared or hosted use, add authentication, tenant isolation on every data query and write, authorization policies, database migrations and backup/restore operations, audit retention policies, rate limiting, HTTPS termination, and an operational secrets strategy. Review proxy/header trust and allowed hosts as part of that deployment work. The Compose setup binds the UI to loopback and keeps the API private to its internal Docker network; it does not substitute for authentication. The API does not consume forwarded client/protocol headers. This demo does not provide payment processing, tax calculations, PDF generation, or real notification delivery.
+
+
+
+> **Disclaimer:** A great deal of this project is build using A.I agents. Changes were made to parts where I disagreed with the agents.

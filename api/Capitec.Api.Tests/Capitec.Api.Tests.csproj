@@ -20,9 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capitec.Api\Capitec.Api.csproj" />
-    <ProjectReference Include="..\Capitec.Application\Capitec.Application.csproj" />
-    <ProjectReference Include="..\Capitec.Infrastructure\Capitec.Infrastructure.csproj" />
-    <ProjectReference Include="..\Capitec.Domain\Capitec.Domain.csproj" />
+    <ProjectReference Include="..\Capitec.Application\Capitec.Business.csproj" />
+    <ProjectReference Include="..\Capitec.DAL\Capitec.DAL.csproj" />
   </ItemGroup>
 
 </Project>

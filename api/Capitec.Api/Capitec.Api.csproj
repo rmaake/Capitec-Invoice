@@ -7,8 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capitec.Application\Capitec.Application.csproj" />
-    <ProjectReference Include="..\Capitec.Infrastructure\Capitec.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Capitec.Application\Capitec.Business.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Contracts\Responses\" />
   </ItemGroup>
 
 </Project>

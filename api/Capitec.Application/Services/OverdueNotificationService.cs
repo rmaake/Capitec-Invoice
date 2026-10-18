@@ -1,8 +1,10 @@
-using Capitec.Application.Abstractions;
-using Capitec.Application.Abstractions.CustomExceptions;
 using Capitec.Application.Contracts;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Domain.Models;
+using Capitec.Business.Enums;
+using Capitec.Business.Extensions;
+using Capitec.DAL.CustomExceptions;
+using Capitec.DAL.Data.Entities;
+using Capitec.DAL.Persistence.Abstractions;
 
 namespace Capitec.Application.Services;
 
@@ -37,7 +39,7 @@ public sealed class OverdueNotificationService(
                 await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
                 await using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
                 var invoice = await unitOfWork.Invoices.GetForUpdateAsync(invoiceId, cancellationToken);
-                if (invoice is null || invoice.Status != InvoiceStatus.Sent || invoice.DueAtUtc.Date >= now.Date)
+                if (invoice is null || invoice.StatusId != (int)InvoiceStatus.Sent || invoice.DueAtUtc.Date >= now.Date)
                 {
                     await transaction.RollbackAsync(cancellationToken);
                     continue;

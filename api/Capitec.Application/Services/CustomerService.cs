@@ -1,8 +1,9 @@
-using Capitec.Application.Abstractions;
-using Capitec.Application.Abstractions.CustomExceptions;
 using Capitec.Application.Contracts;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Domain.Models;
+using Capitec.Business.Extensions;
+using Capitec.DAL.CustomExceptions;
+using Capitec.DAL.Data.Entities;
+using Capitec.DAL.Persistence.Abstractions;
 
 namespace Capitec.Application.Services;
 

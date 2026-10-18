@@ -1,9 +1,8 @@
 using Capitec.Api.Contracts;
-using Capitec.Application.Abstractions.CustomExceptions;
 using Capitec.Application.Contracts;
-using Capitec.Application.Services;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Domain.Models;
+using Capitec.Business.Enums;
+using Capitec.DAL.CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capitec.Api.Controllers;

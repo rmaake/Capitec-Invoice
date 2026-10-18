@@ -2,8 +2,7 @@
   <Folder Name="/api/">
     <Project Path="api/Capitec.Api.Tests/Capitec.Api.Tests.csproj" />
     <Project Path="api/Capitec.Api/Capitec.Api.csproj" />
-    <Project Path="api/Capitec.Application/Capitec.Application.csproj" />
-    <Project Path="api/Capitec.Domain/Capitec.Domain.csproj" />
-    <Project Path="api/Capitec.Infrastructure/Capitec.Infrastructure.csproj" />
+    <Project Path="api/Capitec.Application/Capitec.Business.csproj" />
+    <Project Path="api/Capitec.Infrastructure/Capitec.DAL.csproj" />
   </Folder>
 </Solution>

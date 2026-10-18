@@ -1,16 +1,14 @@
-using System.Text.Json.Serialization;
 using Capitec.Api.Services;
-using Capitec.Application;
 using Capitec.Application.Services;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Infrastructure;
-using Capitec.Infrastructure.Data;
+using Capitec.DAL;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddDAL(builder.Configuration);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton(builder.Configuration.GetSection("Notifications").Get<NotificationScheduleOptions>() ?? new NotificationScheduleOptions());
 builder.Services.AddScoped<ICustomerService, CustomerService>();

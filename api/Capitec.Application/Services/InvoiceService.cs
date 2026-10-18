@@ -1,11 +1,13 @@
+using Capitec.Application.Contracts;
+using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Enums;
+using Capitec.Business.Extensions;
+using Capitec.DAL.CustomExceptions;
+using Capitec.DAL.Data.Entities;
+using Capitec.DAL.Persistence.Abstractions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Capitec.Application.Abstractions;
-using Capitec.Application.Abstractions.CustomExceptions;
-using Capitec.Application.Contracts;
-using Capitec.Application.Services.Abstractions;
-using Capitec.Domain.Models;
 
 namespace Capitec.Application.Services;
 
@@ -14,7 +16,7 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
     public async Task<IReadOnlyList<InvoiceDto>> GetInvoicesAsync(string? search, InvoiceStatus? status, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
-        var invoices = await unitOfWork.Invoices.GetAllAsync(search, status, cancellationToken);
+        var invoices = await unitOfWork.Invoices.GetAllAsync(search, (int?)status, cancellationToken);
         return invoices.Select(invoice => invoice.ToDto(clock.GetUtcNow().UtcDateTime)).ToList();
     }
 
@@ -54,8 +56,8 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
                 CustomerId = command.CustomerId,
                 CreatedAtUtc = now,
                 DueAtUtc = command.DueDate.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc),
-                Status = InvoiceStatus.Sent,
-                Currency = command.Currency.Trim().ToUpperInvariant(),
+                StatusId = (int)InvoiceStatus.Sent,
+                CurrencyId = (int)command.Currency,
                 Notes = string.IsNullOrWhiteSpace(command.Notes) ? null : command.Notes.Trim(),
                 Items = command.Items.Select(item => new InvoiceLineItem
                 {
@@ -99,11 +101,11 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
         var invoice = await unitOfWork.Invoices.GetForUpdateAsync(id, cancellationToken);
         if (invoice is null)
             return null;
-        if (invoice.Status != status && invoice.Status != InvoiceStatus.Sent)
+        if (invoice.StatusId != (int)status && invoice.StatusId != (int)InvoiceStatus.Sent)
             throw new InvalidOperationException("Paid and void invoices cannot be changed.");
-        if (status == InvoiceStatus.Sent && invoice.Status != InvoiceStatus.Sent)
+        if (status == InvoiceStatus.Sent && invoice.StatusId != (int)InvoiceStatus.Sent)
             throw new InvalidOperationException("An invoice cannot return to sent status.");
-        invoice.Status = status;
+        invoice.StatusId = (int)status;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
     }
@@ -120,16 +122,16 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
         var invoice = await unitOfWork.Invoices.GetForUpdateAsync(id, cancellationToken);
         if (invoice is null)
             return null;
-        if (invoice.Status == InvoiceStatus.Void)
+        if (invoice.StatusId == (int)InvoiceStatus.Void)
         {
             if (string.Equals(invoice.VoidReason, normalizedReason, StringComparison.Ordinal))
                 return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
             throw new InvalidOperationException("A voided invoice's reason cannot be changed.");
         }
-        if (invoice.Status != InvoiceStatus.Sent)
+        if (invoice.StatusId != (int)InvoiceStatus.Sent)
             throw new InvalidOperationException("Only sent invoices can be voided.");
 
-        invoice.Status = InvoiceStatus.Void;
+        invoice.StatusId = (int)InvoiceStatus.Void;
         invoice.VoidReason = normalizedReason;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
@@ -141,7 +143,7 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
             throw new ArgumentException("A valid Idempotency-Key header is required.", nameof(key));
         if (command.Items.Count is 0 or > 50 || command.Items.Any(item => item.Quantity <= 0 || item.UnitPrice <= 0 || string.IsNullOrWhiteSpace(item.Description)))
             throw new ArgumentException("Invoices require valid line items.", nameof(command));
-        if (!string.Equals(command.Currency, "ZAR", StringComparison.OrdinalIgnoreCase))
+        if (command.Currency != Currency.ZAR)
             throw new ArgumentException("Only ZAR invoices are currently supported.", nameof(command));
     }
 

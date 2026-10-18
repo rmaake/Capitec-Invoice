@@ -1,6 +1,3 @@
-using Capitec.Application.Contracts;
-using Capitec.Domain.Models;
-
 namespace Capitec.Application.Services;
 
 public sealed class NotificationScheduleOptions

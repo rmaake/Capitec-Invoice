@@ -1,16 +1,16 @@
-using Capitec.Application.Abstractions;
-using Capitec.Infrastructure.Data;
-using Capitec.Infrastructure.Persistence;
+using Capitec.DAL.Data;
+using Capitec.DAL.Persistence.Abstractions;
+using Capitec.DAL.Persistence.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
-namespace Capitec.Infrastructure;
+namespace Capitec.DAL;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDAL(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContextFactory<CapitecDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("Capitec") ?? "Data Source=capitec.db"));

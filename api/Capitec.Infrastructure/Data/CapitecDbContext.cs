@@ -1,10 +1,11 @@
-using Capitec.Domain.Models;
+using Capitec.DAL.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Capitec.Infrastructure.Data;
+namespace Capitec.DAL.Data;
 
 public sealed class CapitecDbContext(DbContextOptions<CapitecDbContext> options) : DbContext(options)
 {
+    public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();

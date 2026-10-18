@@ -1,7 +1,7 @@
-using Capitec.Application.Abstractions;
 using Capitec.Application.Contracts;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Domain.Models;
+using Capitec.Business.Enums;
+using Capitec.DAL.Persistence.Abstractions;
 
 namespace Capitec.Application.Services;
 
@@ -12,10 +12,10 @@ public sealed class DashboardService(IUnitOfWorkFactory unitOfWorkFactory, TimeP
         await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
         var today = clock.GetUtcNow().UtcDateTime.Date;
         var invoices = await unitOfWork.Invoices.GetForDashboardAsync(cancellationToken);
-        var outstanding = invoices.Where(invoice => invoice.Status == InvoiceStatus.Sent && invoice.Currency == "ZAR").ToList();
+        var outstanding = invoices.Where(invoice => invoice.StatusId == (int)InvoiceStatus.Sent && invoice.CurrencyId == (int)Currency.ZAR).ToList();
         return new DashboardDto(invoices.Count,
             outstanding.Count(invoice => invoice.DueAtUtc.Date < today),
             await unitOfWork.Customers.CountAsync(cancellationToken),
-            outstanding.Sum(invoice => invoice.Total), "ZAR");
+            outstanding.Sum(invoice => invoice.Total), Currency.ZAR);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Capitec.Application.Services;
+using Capitec.Domain.Enums;
 using Capitec.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;

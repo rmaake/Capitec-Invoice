@@ -1,8 +1,5 @@
 ﻿using Capitec.Application.Contracts;
-using Capitec.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Capitec.Business.Enums;
 
 namespace Capitec.Application.Services.Abstractions
 {

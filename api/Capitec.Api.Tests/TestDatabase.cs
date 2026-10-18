@@ -1,6 +1,6 @@
 ﻿using Capitec.Application.Abstractions;
-using Capitec.Infrastructure.Data;
-using Capitec.Infrastructure.Persistence;
+using Capitec.DAL.Data;
+using Capitec.DAL.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;

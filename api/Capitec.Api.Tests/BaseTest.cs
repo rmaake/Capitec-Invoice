@@ -1,6 +1,6 @@
 ﻿using Capitec.Application.Contracts;
 using Capitec.Domain.Models;
-using Capitec.Infrastructure.Data;
+using Capitec.DAL.Data;
 
 namespace Capitec.Api.Tests
 {
