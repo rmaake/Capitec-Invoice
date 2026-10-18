@@ -88,11 +88,4 @@ public class InvoiceTests : BaseTest
         Assert.Single(reminders);
         Assert.Equal(invoice.Id, reminders[0].InvoiceId);
     }
-
-    
-    
-
-    
-    
-    
 }

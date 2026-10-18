@@ -1,0 +1,7 @@
+<div class="row-actions">
+    <button class="small-action" type="button" (click)="details.emit(invoice())">Details</button>
+    @if (invoice().status === 'Sent') {
+    <button class="small-action" type="button" (click)="paid.emit(invoice())">Mark paid</button>
+    <button class="small-action danger-action" type="button" (click)="voidRequested.emit(invoice())">Void</button>
+    }
+</div>

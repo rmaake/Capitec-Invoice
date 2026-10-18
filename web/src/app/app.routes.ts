@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { CustomersPageComponent } from './pages/customers-page.component';
-import { InvoicesPageComponent } from './pages/invoices-page.component';
-import { OverviewPageComponent } from './pages/overview-page.component';
-import { RemindersPageComponent } from './pages/reminders-page.component';
+import { CustomersPageComponent } from './pages/customers-page/customers-page.component';
+import { InvoicesPageComponent } from './pages/invoices-page/invoices-page.component';
+import { OverviewPageComponent } from './pages/overview-page/overview-page.component';
+import { RemindersPageComponent } from './pages/reminders-page/reminders-page.component';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'overview' },

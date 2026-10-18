@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ApiFeedbackService } from './api-feedback';
-import { WorkspaceDialogsComponent } from './components/workspace-dialogs.component';
+import { WorkspaceDialogsComponent } from './components/workspace-dialogs/workspace-dialogs.component';
 import { WorkspaceStore } from './workspace.store';
 
 @Component({
