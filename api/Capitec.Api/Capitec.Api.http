@@ -1,0 +1,6 @@
+@Capitec.Api_HostAddress = http://localhost:5105
+
+GET {{Capitec.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

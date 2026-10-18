@@ -1,0 +1,39 @@
+<div class="workspace">
+  <aside class="sidebar" aria-label="Primary navigation">
+    <a class="brand" routerLink="/overview"><span class="brand-mark">C</span><span class="brand-copy"><strong>capitec</strong><small>BUSINESS INVOICING</small></span></a>
+    <p class="nav-label">WORKSPACE</p>
+    <nav class="nav-list">
+      <a class="nav-item" routerLink="/overview" routerLinkActive="active"><span class="nav-icon">◫</span>Overview</a>
+      <a class="nav-item" routerLink="/invoices" routerLinkActive="active"><span class="nav-icon">▤</span>Invoices <span class="nav-count">{{ store.invoices().length }}</span></a>
+      <a class="nav-item" routerLink="/customers" routerLinkActive="active"><span class="nav-icon">♙</span>Customers <span class="nav-count">{{ store.customers().length }}</span></a>
+      <a class="nav-item" routerLink="/reminders" routerLinkActive="active"><span class="nav-icon">◷</span>Reminders <span class="nav-count">{{ store.notifications().length }}</span></a>
+    </nav>
+    <div class="sidebar-spacer"></div>
+    <div class="simulation-note"><span class="online-dot"></span><span><strong>Simulation mode</strong><small>No messages are sent</small></span></div>
+    <div class="profile"><span class="avatar">CB</span><span><strong>Capitec Business</strong><small>Workspace admin</small></span></div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Business invoicing</strong></div><span class="today">{{ today | date:'EEEE, d MMMM y' }}</span><span class="avatar top-avatar">CB</span></header>
+    <section class="page-content">
+      @if (store.pageFeedback(); as feedback) {
+        <div class="page-feedback" [class.feedback-success]="feedback.kind === 'success'" [class.feedback-failure]="feedback.kind === 'failure'" [attr.role]="feedback.kind === 'failure' ? 'alert' : 'status'">
+          <span class="feedback-mark" aria-hidden="true">{{ feedback.kind === 'success' ? '✓' : '!' }}</span>
+          <span>{{ feedback.message }}</span>
+          <button type="button" aria-label="Dismiss message" (click)="dismissPageFeedback()">×</button>
+        </div>
+      }
+      <router-outlet />
+      <footer class="footer"><span>Capitec Business Invoicing</span><span>Amounts in South African rand (ZAR)</span></footer>
+    </section>
+  </main>
+</div>
+
+<app-workspace-dialogs />
+
+@if (apiFeedback.loading()) {
+  <div class="api-overlay loading-overlay" role="status" aria-live="polite" aria-label="Waiting for the service"><div class="overlay-panel loading-panel"><span class="loading-spinner" aria-hidden="true"></span><strong>Working</strong><p>Waiting for the service to respond</p></div></div>
+}
+@if (apiFeedback.result(); as result) {
+  <div class="api-overlay result-overlay" role="presentation"><section class="overlay-panel result-panel" role="dialog" aria-modal="true" aria-labelledby="result-title" aria-describedby="result-message"><span class="result-mark" [class.result-success]="result.kind === 'success'" [class.result-failure]="result.kind === 'failure'" aria-hidden="true">{{ result.kind === 'success' ? '✓' : '!' }}</span><h2 id="result-title">{{ result.title }}</h2><p id="result-message">{{ result.message }}</p><button type="button" class="button primary" (click)="apiFeedback.dismissResult()">Continue</button></section></div>
+}

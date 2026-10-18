@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Capitec: Data Source=/app/data/capitec.db
+      Notifications__Enabled: ${CAPITEC_SCHEDULED_SIMULATIONS:-false}
+      Notifications__IntervalMinutes: ${CAPITEC_SIMULATION_INTERVAL_MINUTES:-60}
+      Notifications__WindowDays: ${CAPITEC_REMINDER_WINDOW_DAYS:-7}
+    volumes:
+      - capitec-data:/app/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    depends_on:
+      - api
+    ports:
+      - "127.0.0.1:${CAPITEC_WEB_PORT:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  capitec-data:
