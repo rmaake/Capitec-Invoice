@@ -13,6 +13,17 @@ A small business invoicing workspace built with Angular 20 and ASP.NET Core 10. 
 - Trigger a reminder simulation manually or enable an optional background schedule. Both modes use the same unique invoice and policy-window constraint, so repeated runs do not duplicate reminder records.
 - Keep SQLite data across container restarts using a named Docker volume.
 
+## Further Considerations
+
+Below items are not implemented, only thought out.
+- `Authentication and Authorization:` These could be implemented using Identity, OAuth 2.0, or a simple password. Controllers can be locked using the `Authorize` attributes. Where necessary, role-based authorization can be used. Other authentication schemes to be used are JWT, cookies and 2-FA.
+- `Database design:` Currently SQLite is used with minimum migrations. For production ready system, various SQL database providers such as MSSQL Server, PostgreSQL, Oracle can be used. Preffered choice being MSSQL Server. Entity Framework Core, with code first migrations would be preferable. Where database exists, scaffolding using database-first migration is key. Current system follows simple relationship and cardinalities. Invoice items link to invoice, invoices links to a customer.
+- `Invoice Completion:` In cases where an invoice is to be marked as 'Paid', a user would be required to upload proof payment. Upon review, the uploaded files would be available to view.
+- `Invoice Cancellation:` When an invoice is voided, an intemediate status is set until the invoice is reviewed by a supervisor, or a supervisor code is supplied.
+- `Email Service Integration:` This is crucial and will be used to send out emails to customers when an invoice is generated, due, overdue or paid.
+- `Payment Gateway Integration:` Generated invoices could contain a link to payment page. Upon successful payment, the system automatically mark the invoice as 'Paid'
+- `Partial Payment:` A useful feature that will enable to customers to pay their invoice in parts and/or intervals.
+
 ## API Architecture
 
 The .NET solution uses a dependency-inverted n-tier structure:
