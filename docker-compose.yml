@@ -7,13 +7,28 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Capitec: Data Source=/app/data/capitec.db
+      ConnectionStrings__Capitec: Server=sqlserver;Database=MyDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True
       Notifications__Enabled: ${CAPITEC_SCHEDULED_SIMULATIONS:-false}
       Notifications__IntervalMinutes: ${CAPITEC_SIMULATION_INTERVAL_MINUTES:-60}
       Notifications__WindowDays: ${CAPITEC_REMINDER_WINDOW_DAYS:-7}
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrongPassword123!"
+
+    ports:
+      - "1433:1433"
+
     volumes:
-      - capitec-data:/app/data
-    restart: unless-stopped
+      - sql_data:/var/opt/mssql
+  volumes:
+    - capitec-data:/app/data
+  restart: unless-stopped
 
   web:
     build:

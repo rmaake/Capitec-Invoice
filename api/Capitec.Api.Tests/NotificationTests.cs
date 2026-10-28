@@ -1,10 +1,7 @@
 ﻿using Capitec.Application.Services;
-using Capitec.Domain.Enums;
-using Capitec.Domain.Models;
+using Capitec.DAL.Data.Entities;
+using Capitec.DAL.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Capitec.Api.Tests
 {
@@ -22,7 +19,7 @@ namespace Capitec.Api.Tests
                 CustomerId = customer.Id,
                 CreatedAtUtc = now.AddDays(-40).UtcDateTime,
                 DueAtUtc = now.AddDays(-3).UtcDateTime,
-                Status = InvoiceStatus.Sent,
+                StatusId = (int)InvoiceStatus.Sent,
                 Items = [new InvoiceLineItem { Description = "Consulting", Quantity = 1, UnitPrice = 1000m }]
             };
             database.Context.Invoices.Add(invoice);
@@ -51,7 +48,7 @@ namespace Capitec.Api.Tests
                 CustomerId = customer.Id,
                 CreatedAtUtc = now.AddDays(-40).UtcDateTime,
                 DueAtUtc = now.AddDays(-3).UtcDateTime,
-                Status = InvoiceStatus.Sent,
+                StatusId = (int)InvoiceStatus.Sent,
                 Items = [new InvoiceLineItem { Description = "Consulting", Quantity = 1, UnitPrice = 1000m }]
             });
             await database.Context.SaveChangesAsync();

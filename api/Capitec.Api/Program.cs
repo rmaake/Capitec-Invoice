@@ -1,7 +1,9 @@
 using Capitec.Api.Services;
 using Capitec.Application.Services;
 using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Constants;
 using Capitec.DAL;
+using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +22,14 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-await app.Services.InitializeDatabaseAsync();
+using var scope = app.Services.CreateScope();
 
-app.MapHealthChecks("/health");
+var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+await RoleSeeder.SeedAsync(roleManager);
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

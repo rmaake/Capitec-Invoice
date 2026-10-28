@@ -1,11 +1,8 @@
-﻿using Capitec.Application.Abstractions;
-using Capitec.DAL.Data;
-using Capitec.DAL.Persistence;
+﻿using Capitec.DAL.Data;
+using Capitec.DAL.Persistence.Abstractions;
+using Capitec.DAL.Persistence.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Capitec.Api.Tests
 {

@@ -1,7 +1,5 @@
-using Capitec.Api.Contracts;
-using Capitec.Application.Services;
 using Capitec.Application.Services.Abstractions;
-using Capitec.Application.Contracts;
+using Capitec.Business.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capitec.Api.Controllers;

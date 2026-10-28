@@ -1,6 +1,7 @@
-﻿using Capitec.Application.Contracts;
-using Capitec.Domain.Models;
+﻿using Capitec.Business.Contracts;
 using Capitec.DAL.Data;
+using Capitec.DAL.Data.Entities;
+using Capitec.DAL.Enums;
 
 namespace Capitec.Api.Tests
 {
@@ -9,7 +10,7 @@ namespace Capitec.Api.Tests
         protected CreateInvoiceCommand CreateCommand(int customerId, string? notes = null, DateOnly? dueDate = null) => new(
         customerId,
         dueDate ?? new DateOnly(2026, 10, 30),
-        "ZAR",
+        Currency.ZAR,
         notes,
         [new CreateInvoiceLineCommand("Consulting", 2, 1250m)]);
 

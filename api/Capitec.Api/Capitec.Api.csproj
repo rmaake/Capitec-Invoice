@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,15 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capitec.Application\Capitec.Business.csproj" />
+    <Folder Include="Contracts\Responses\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Responses\" />
+    <ProjectReference Include="..\Capitec.Business\Capitec.Business.csproj" />
   </ItemGroup>
 
 </Project>

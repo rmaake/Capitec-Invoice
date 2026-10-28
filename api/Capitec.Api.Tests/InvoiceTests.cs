@@ -1,6 +1,6 @@
-using Capitec.Application.Abstractions.CustomExceptions;
 using Capitec.Application.Services;
-using Capitec.Domain.Enums;
+using Capitec.DAL.CustomExceptions;
+using Capitec.DAL.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Capitec.Api.Tests;

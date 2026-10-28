@@ -1,6 +1,6 @@
 using Capitec.Api.Contracts;
-using Capitec.Application.Contracts;
 using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Contracts;
 using Capitec.DAL.CustomExceptions;
 using Microsoft.AspNetCore.Mvc;
 

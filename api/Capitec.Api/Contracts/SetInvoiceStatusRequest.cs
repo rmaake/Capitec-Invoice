@@ -1,4 +1,4 @@
-﻿using Capitec.Business.Enums;
+﻿using Capitec.DAL.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Capitec.Api.Contracts
