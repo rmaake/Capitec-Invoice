@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Capitec.Business.Services
 {
-    internal class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -30,10 +30,12 @@ namespace Capitec.Business.Services
                 CreatedDate = DateTime.Now,
                 LockoutEnabled = true,
             };
-
-            return await _userManager.CreateAsync(
-                user,
-                request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (result.Succeeded)
+            {
+                result = await _userManager.AddToRoleAsync(user, request.Role);
+            }
+            return result;
         }
 
         public async Task<LoginResultDto> LoginAsync(LoginUserCommand request)

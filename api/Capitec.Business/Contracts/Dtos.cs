@@ -2,7 +2,7 @@ using Capitec.DAL.Enums;
 
 namespace Capitec.Business.Contracts;
 
-public sealed record RegisterUserCommand(string Email, string Password, string FirstName, string LastName);
+public sealed record RegisterUserCommand(string Email, string Password, string FirstName, string LastName, string Role);
 public sealed record LoginUserCommand(string Email, string Password, bool RememberMe);
 public sealed record LoginResultDto(bool Success, string? Token, string? ErrorMessage);
 

@@ -1,4 +1,4 @@
-namespace Capitec.Application.Services;
+namespace Capitec.Business.Services.Options;
 
 public sealed class NotificationScheduleOptions
 {

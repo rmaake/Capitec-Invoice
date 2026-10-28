@@ -1,4 +1,4 @@
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.Business.Extensions;
 using Capitec.DAL.CustomExceptions;
@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace Capitec.Application.Services;
+namespace Capitec.Business.Services;
 
 public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimeProvider clock) : IInvoiceService
 {

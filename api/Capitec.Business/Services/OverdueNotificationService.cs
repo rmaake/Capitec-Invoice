@@ -1,12 +1,13 @@
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.Business.Extensions;
 using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Data.Entities;
 using Capitec.DAL.Enums;
 using Capitec.DAL.Persistence.Abstractions;
+using Capitec.Business.Services.Options;
 
-namespace Capitec.Application.Services;
+namespace Capitec.Business.Services;
 
 public sealed class OverdueNotificationService(
     IUnitOfWorkFactory unitOfWorkFactory,

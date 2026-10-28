@@ -238,6 +238,13 @@ namespace Capitec.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Currencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "ZAR"
+                        });
                 });
 
             modelBuilder.Entity("Capitec.DAL.Data.Entities.Misc.InvoiceStatus", b =>
@@ -255,6 +262,28 @@ namespace Capitec.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InvoiceStatuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Sent"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Paid"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "PendingAuthorization"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Void"
+                        });
                 });
 
             modelBuilder.Entity("Capitec.DAL.Data.Entities.SimulatedNotification", b =>

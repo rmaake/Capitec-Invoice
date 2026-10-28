@@ -28,7 +28,10 @@ public static class DependencyInjection
                 options.User.RequireUniqueEmail = true;
             })
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<CapitecDbContext>();
+            .AddEntityFrameworkStores<CapitecDbContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+
         return services;
     }
 }

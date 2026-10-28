@@ -1,6 +1,6 @@
 ﻿using Capitec.Business.Contracts;
 
-namespace Capitec.Application.Services.Abstractions
+namespace Capitec.Business.Services.Abstractions
 {
     public interface IDashboardService
     {

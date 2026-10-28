@@ -7,10 +7,12 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__Capitec: Server=sqlserver;Database=MyDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True
-      Notifications__Enabled: ${CAPITEC_SCHEDULED_SIMULATIONS:-false}
-      Notifications__IntervalMinutes: ${CAPITEC_SIMULATION_INTERVAL_MINUTES:-60}
-      Notifications__WindowDays: ${CAPITEC_REMINDER_WINDOW_DAYS:-7}
+      ConnectionStrings__Capitec: Server=${DB_SERVER};Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};TrustServerCertificate=True
+      Notifications__Enabled: ${CAPITEC_SCHEDULED_SIMULATIONS}
+      Notifications__IntervalMinutes: ${CAPITEC_SIMULATION_INTERVAL_MINUTES}
+      Notifications__WindowDays: ${CAPITEC_REMINDER_WINDOW_DAYS}
+      AdminUser__Username: ${CAPITEC_ADMIN_USERNAME}
+      AdminUser__Password: ${CAPITEC_ADMIN_PASSWORD}
     depends_on:
       - sqlserver
 
@@ -19,16 +21,13 @@ services:
 
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "YourStrongPassword123!"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
 
     ports:
       - "1433:1433"
-
     volumes:
-      - sql_data:/var/opt/mssql
-  volumes:
-    - capitec-data:/app/data
-  restart: unless-stopped
+      - capitec-data:/app/data/mssql
+    restart: unless-stopped
 
   web:
     build:

@@ -1,9 +1,9 @@
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.DAL.Enums;
 using Capitec.DAL.Persistence.Abstractions;
 
-namespace Capitec.Application.Services;
+namespace Capitec.Business.Services;
 
 public sealed class DashboardService(IUnitOfWorkFactory unitOfWorkFactory, TimeProvider clock) : IDashboardService
 {

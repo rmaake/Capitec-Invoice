@@ -8,9 +8,8 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-build
 WORKDIR /src
 COPY api/Capitec.Api/Capitec.Api.csproj api/Capitec.Api/
-COPY api/Capitec.Domain/Capitec.Domain.csproj api/Capitec.Domain/
-COPY api/Capitec.Application/Capitec.Application.csproj api/Capitec.Application/
-COPY api/Capitec.Infrastructure/Capitec.Infrastructure.csproj api/Capitec.Infrastructure/
+COPY api/Capitec.Business/Capitec.Business.csproj api/Capitec.Business/
+COPY api/Capitec.DAL/Capitec.DAL.csproj api/Capitec.DAL/
 RUN dotnet restore api/Capitec.Api/Capitec.Api.csproj
 COPY api/ api/
 RUN dotnet publish api/Capitec.Api/Capitec.Api.csproj -c Release -o /out --no-restore /p:UseAppHost=false

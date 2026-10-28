@@ -1,5 +1,5 @@
 using Capitec.Api.Contracts;
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Enums;

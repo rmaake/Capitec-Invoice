@@ -1,7 +1,7 @@
 ﻿using Capitec.Business.Contracts;
 using Capitec.DAL.Enums;
 
-namespace Capitec.Application.Services.Abstractions
+namespace Capitec.Business.Services.Abstractions
 {
     public interface IInvoiceService
     {

@@ -1,6 +1,7 @@
 ﻿using Capitec.Api.Contracts;
 using Capitec.Business.Contracts;
 using Capitec.Business.Services.Abstractions;
+using Capitec.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +19,17 @@ namespace Capitec.Api.Controllers
             _authService = authService;
         }
 
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register(
-        RegistrationRequest request)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> Register([FromBody]RegistrationRequest request)
         {
             if (!request.ConfirmPassword.Equals(request.Password))
             {
                 return BadRequest(new List<IdentityError> { new IdentityError { Description = "Password and Confirm Password do not match." } });
             }
 
-            var command = new RegisterUserCommand(request.Email, request.Password, request.FirstName, request.LastName);
+            var command = new RegisterUserCommand(request.Email, request.Password, request.FirstName, request.LastName, request.Role);
 
             var result = await _authService.RegisterAsync(command);
 
@@ -41,8 +43,7 @@ namespace Capitec.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(
-            LoginRequest request)
+        public async Task<IActionResult> Login([FromBody]LoginRequest request)
         {
             var command = new LoginUserCommand(request.Email, request.Password, request.RememberMe);
             var success = await _authService.LoginAsync(command);

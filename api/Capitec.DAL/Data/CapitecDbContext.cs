@@ -1,5 +1,5 @@
 using Capitec.DAL.Data.Entities;
-using Capitec.DAL.Data.Entities.Misc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,20 +20,21 @@ public sealed class CapitecDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
     public DbSet<SimulatedNotification> SimulatedNotifications => Set<SimulatedNotification>();
-    public DbSet<InvoiceStatus> InvoiceStatuses => Set<InvoiceStatus>();
-    public DbSet<Currency> Currencies => Set<Currency>();
+    public DbSet<Entities.Misc.InvoiceStatus> InvoiceStatuses => Set<Entities.Misc.InvoiceStatus>();
+    public DbSet<Entities.Misc.Currency> Currencies => Set<Entities.Misc.Currency>();
 
-    //protected override void OnModelCreating(ModelBuilder modelBuilder)
-    //{
-    //    modelBuilder.Entity<Customer>().HasIndex(customer => customer.NormalizedEmail).IsUnique();
-    //    modelBuilder.Entity<Invoice>().HasIndex(invoice => invoice.Number).IsUnique();
-    //    modelBuilder.Entity<Invoice>().HasMany(invoice => invoice.Items).WithOne(item => item.Invoice)
-    //        .HasForeignKey(item => item.InvoiceId).OnDelete(DeleteBehavior.Cascade);
-    //    modelBuilder.Entity<IdempotencyRecord>().HasKey(record => record.Key);
-    //    modelBuilder.Entity<IdempotencyRecord>().HasOne(record => record.Invoice).WithMany(invoice => invoice.IdempotencyRecords)
-    //        .HasForeignKey(record => record.InvoiceId).OnDelete(DeleteBehavior.Cascade);
-    //    modelBuilder.Entity<SimulatedNotification>().HasIndex(notification => new { notification.InvoiceId, notification.PolicyWindow }).IsUnique();
-    //    modelBuilder.Entity<SimulatedNotification>().HasOne(notification => notification.Invoice).WithMany(invoice => invoice.Notifications)
-    //        .HasForeignKey(notification => notification.InvoiceId).OnDelete(DeleteBehavior.Cascade);
-    //}
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Entities.Misc.InvoiceStatus>().HasData(
+            new Entities.Misc.InvoiceStatus { Id = (int)Enums.InvoiceStatus.Sent, Name = Enums.InvoiceStatus.Sent.ToString() },
+            new Entities.Misc.InvoiceStatus { Id = (int)Enums.InvoiceStatus.Paid, Name = Enums.InvoiceStatus.Paid.ToString() },
+            new Entities.Misc.InvoiceStatus { Id = (int)Enums.InvoiceStatus.PendingAuthorization, Name = Enums.InvoiceStatus.PendingAuthorization.ToString() },
+            new Entities.Misc.InvoiceStatus { Id = (int)Enums.InvoiceStatus.Void, Name = Enums.InvoiceStatus.Void.ToString() }
+        );
+
+        modelBuilder.Entity<Entities.Misc.Currency>().HasData(
+            new Entities.Misc.Currency { Id = (int)Enums.Currency.ZAR, Code = Enums.Currency.ZAR.ToString() }
+        );
+        base.OnModelCreating(modelBuilder);
+    }
 }

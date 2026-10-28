@@ -1,5 +1,5 @@
-using Capitec.Application.Services;
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
+using Capitec.Business.Services.Options;
 
 namespace Capitec.Api.Services;
 

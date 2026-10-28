@@ -1,11 +1,11 @@
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.Business.Extensions;
 using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Data.Entities;
 using Capitec.DAL.Persistence.Abstractions;
 
-namespace Capitec.Application.Services;
+namespace Capitec.Business.Services;
 
 public sealed class CustomerService(IUnitOfWorkFactory unitOfWorkFactory, TimeProvider clock) : ICustomerService
 {

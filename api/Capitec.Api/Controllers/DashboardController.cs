@@ -1,4 +1,4 @@
-using Capitec.Application.Services.Abstractions;
+using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
