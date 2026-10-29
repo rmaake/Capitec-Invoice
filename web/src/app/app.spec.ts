@@ -40,13 +40,18 @@ const storeStub = {
 };
 
 describe('App login and workspace routes', () => {
+  const apiStub = {
+    getAuthSession: () => of({ authenticated: true, roles: ['Admin'], firstName: 'Alex', lastName: 'Mokoena', email: 'alex@example.test' }),
+    logout: jasmine.createSpy('logout').and.returnValue(of(void 0))
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
         provideHttpClient(),
         provideRouter(routes),
-        { provide: InvoiceApi, useValue: { getAuthSession: () => of({ authenticated: true, roles: ['Admin'] }) } },
+        { provide: InvoiceApi, useValue: apiStub },
         { provide: WorkspaceStore, useValue: storeStub }
       ]
     }).compileComponents();
@@ -86,5 +91,25 @@ describe('App login and workspace routes', () => {
       fixture.detectChanges();
       expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain(heading);
     }
+  });
+
+  it('shows the signed-in user initials and signs out to login', async () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/overview');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.profile .avatar')?.textContent?.trim()).toBe('AM');
+    expect(compiled.querySelector('.profile-copy strong')?.textContent).toContain('Alex Mokoena');
+
+    compiled.querySelector<HTMLButtonElement>('.profile-signout')?.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(apiStub.logout).toHaveBeenCalled();
+    expect(router.url).toBe('/login');
   });
 });

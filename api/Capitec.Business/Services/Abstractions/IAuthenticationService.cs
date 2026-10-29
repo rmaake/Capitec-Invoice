@@ -9,6 +9,8 @@ namespace Capitec.Business.Services.Abstractions
 
         Task<LoginResultDto> LoginAsync(LoginUserCommand request);
 
+        Task<AuthSessionDto?> GetSessionAsync(string userId);
+
         Task LogoutAsync();
     }
 

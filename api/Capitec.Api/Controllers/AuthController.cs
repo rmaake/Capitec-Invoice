@@ -54,13 +54,21 @@ namespace Capitec.Api.Controllers
 
         [Authorize]
         [HttpGet("session")]
-        public IActionResult Session()
+        public async Task<IActionResult> Session()
         {
-            return Ok(new
-            {
-                authenticated = User.Identity?.IsAuthenticated == true,
-                roles = User.FindAll(ClaimTypes.Role).Select(claim => claim.Value).Distinct().ToArray()
-            });
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized();
+            var session = await _authService.GetSessionAsync(userId);
+            return session is null
+                ? Unauthorized()
+                : Ok(new
+                {
+                    authenticated = true,
+                    roles = session.Roles,
+                    firstName = session.FirstName,
+                    lastName = session.LastName,
+                    email = session.Email
+                });
         }
 
         [Authorize]

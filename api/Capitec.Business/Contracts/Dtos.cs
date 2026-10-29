@@ -5,6 +5,7 @@ namespace Capitec.Business.Contracts;
 public sealed record RegisterUserCommand(string Email, string Password, string FirstName, string LastName, string Role);
 public sealed record LoginUserCommand(string Email, string Password, bool RememberMe);
 public sealed record LoginResultDto(bool Success, string? Token, string? ErrorMessage);
+public sealed record AuthSessionDto(IReadOnlyList<string> Roles, string FirstName, string LastName, string Email);
 public sealed record CreateManagedUserCommand(string Email, string Password, string FirstName, string LastName, string Role);
 public sealed record UpdateManagedUserCommand(string Email, string FirstName, string LastName, string Role);
 public sealed record ManagedUserDto(string Id, string Email, string FirstName, string LastName, string Role, bool IsLockedOut);

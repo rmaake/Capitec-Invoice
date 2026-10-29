@@ -13,12 +13,15 @@
     </nav>
     <div class="sidebar-spacer"></div>
     <div class="simulation-note"><span class="online-dot"></span><span><strong>Simulation mode</strong><small>No messages are sent</small></span></div>
-    <div class="profile"><span class="avatar">CB</span><span><strong>Capitec Business</strong><small>Workspace admin</small></span></div>
+    <div class="profile"><span class="avatar">{{ authSession.initials() }}</span><span class="profile-copy"><strong>{{ authSession.profile().firstName }} {{ authSession.profile().lastName }}</strong><small>{{ authSession.profile().email }}</small></span><button class="profile-signout" type="button" (click)="signOut()" aria-label="Sign out" title="Sign out"><span aria-hidden="true">↪</span><span>Sign out</span></button></div>
   </aside>
 
   <main class="main-area">
-    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Business invoicing</strong></div><span class="today">{{ today | date:'EEEE, d MMMM y' }}</span><span class="avatar top-avatar">CB</span></header>
+    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong>Business invoicing</strong></div><span class="today">{{ today | date:'EEEE, d MMMM y' }}</span><span class="avatar top-avatar" aria-label="Signed in user initials">{{ authSession.initials() }}</span></header>
     <section class="page-content">
+      @if (signOutError.message) {
+        <div class="sign-out-error" role="alert">{{ signOutError.message }}</div>
+      }
       @if (store.pageFeedback(); as feedback) {
         <div class="page-feedback" [class.feedback-success]="feedback.kind === 'success'" [class.feedback-failure]="feedback.kind === 'failure'" [attr.role]="feedback.kind === 'failure' ? 'alert' : 'status'">
           <span class="feedback-mark" aria-hidden="true">{{ feedback.kind === 'success' ? '✓' : '!' }}</span>

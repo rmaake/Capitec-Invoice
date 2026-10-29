@@ -39,18 +39,20 @@ describe('authGuard', () => {
   it('allows workspace navigation when the server confirms the session', async () => {
     const navigation = router.navigateByUrl('/overview');
     await Promise.resolve();
-    http.expectOne('/api/auth/session').flush({ authenticated: true, roles: ['User'] });
+    http.expectOne('/api/auth/session').flush({ authenticated: true, roles: ['User'], firstName: 'Alex', lastName: 'Mokoena', email: 'alex@example.test' });
 
     expect(await navigation).toBeTrue();
     expect(router.url).toBe('/overview');
     expect(sessionStore.roles()).toEqual(['User']);
+    expect(sessionStore.profile()).toEqual({ firstName: 'Alex', lastName: 'Mokoena', email: 'alex@example.test' });
+    expect(sessionStore.initials()).toBe('AM');
     expect(sessionStore.canAuthorizeVoid()).toBeFalse();
   });
 
   it('recognizes Admin and Manager roles as void approvers', async () => {
     const navigation = router.navigateByUrl('/overview');
     await Promise.resolve();
-    http.expectOne('/api/auth/session').flush({ authenticated: true, roles: ['Manager'] });
+    http.expectOne('/api/auth/session').flush({ authenticated: true, roles: ['Manager'], firstName: 'Sam', lastName: 'Lee', email: 'sam@example.test' });
 
     expect(await navigation).toBeTrue();
     expect(sessionStore.canAuthorizeVoid()).toBeTrue();

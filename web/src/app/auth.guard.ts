@@ -11,10 +11,14 @@ export const authGuard: CanActivateChildFn = async () => {
 
   try {
     const session = await firstValueFrom(api.getAuthSession());
-    sessionStore.setRoles(session.roles ?? []);
-    return session.authenticated ? true : router.createUrlTree(['/login']);
+    if (session.authenticated) {
+      sessionStore.setSession(session);
+      return true;
+    }
+    sessionStore.clear();
+    return router.createUrlTree(['/login']);
   } catch {
-    sessionStore.setRoles([]);
+    sessionStore.clear();
     return router.createUrlTree(['/login']);
   }
 };

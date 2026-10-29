@@ -65,6 +65,18 @@ namespace Capitec.Business.Services
             return new LoginResultDto(true, null, null);
         }
 
+        public async Task<AuthSessionDto?> GetSessionAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null || user.IsDeleted)
+            {
+                return null;
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return new AuthSessionDto(roles.ToArray(), user.FirstName, user.LastName, user.Email ?? string.Empty);
+        }
+
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();

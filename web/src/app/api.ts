@@ -20,7 +20,9 @@ export interface CreateInvoice {
   items: Array<{ description: string; quantity: number; unitPrice: number }>;
 }
 export interface LoginRequest { email: string; password: string; rememberMe: boolean; }
-export interface AuthSession { authenticated: boolean; roles: string[]; }
+export interface AuthSession {
+  authenticated: boolean; roles: string[]; firstName: string; lastName: string; email: string;
+}
 export interface ManagedUser {
   id: string; email: string; firstName: string; lastName: string; role: string; isLockedOut: boolean;
 }
@@ -34,6 +36,7 @@ export class InvoiceApi {
   private readonly baseUrl = '/api';
   login(value: LoginRequest): Observable<void> { return this.http.post<void>(`${this.baseUrl}/auth/login`, value); }
   getAuthSession(): Observable<AuthSession> { return this.http.get<AuthSession>(`${this.baseUrl}/auth/session`); }
+  logout(): Observable<void> { return this.http.post<void>(`${this.baseUrl}/auth/logout`, {}); }
   getManagedUsers(): Observable<ManagedUser[]> { return this.http.get<ManagedUser[]>(`${this.baseUrl}/admin/users`); }
   createManagedUser(value: ManagedUserDraft & { password: string }): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/admin/users`, value);
