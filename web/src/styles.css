@@ -1123,6 +1123,10 @@ td small {
     color: #76504c;
     background: #f1e9e7;
 }
+.status.pending-status {
+    color: #805c24;
+    background: #f8efd9;
+}
 .void-modal {
     border-top: 3px solid #ba5042;
 }

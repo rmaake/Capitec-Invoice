@@ -10,6 +10,7 @@ templateUrl: './invoice-actions.component.html'
 
 export class InvoiceActionsComponent {
   readonly invoice = input.required<Invoice>();
+  readonly canAuthorizeVoid = input(false);
   readonly details = output<Invoice>();
   readonly paid = output<Invoice>();
   readonly voidRequested = output<Invoice>();

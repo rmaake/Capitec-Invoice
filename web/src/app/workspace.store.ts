@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, forkJoin } from 'rxjs';
 import { Customer, CreateInvoice, Dashboard, Invoice, InvoiceApi, Notification } from './api';
 import { ApiFeedbackService, ApiResultKind } from './api-feedback';
+import { AuthSessionStore } from './auth-session.store';
 
 export type WorkspaceDialog = 'customer' | 'invoice' | 'details' | 'void' | 'payment-proof' | null;
 
@@ -9,6 +10,7 @@ export type WorkspaceDialog = 'customer' | 'invoice' | 'details' | 'void' | 'pay
 export class WorkspaceStore {
   private readonly api = inject(InvoiceApi);
   private readonly feedback = inject(ApiFeedbackService);
+  private readonly authSession = inject(AuthSessionStore);
 
   readonly dashboard = signal<Dashboard | null>(null);
   readonly customers = signal<Customer[]>([]);
@@ -34,6 +36,8 @@ export class WorkspaceStore {
   private customerForInvoice = false;
   private returnToDetailsAfterVoid = false;
   private returnToDetailsAfterPayment = false;
+
+  canAuthorizeVoid(): boolean { return this.authSession.canAuthorizeVoid(); }
 
   constructor() { void this.refresh(); }
 
@@ -66,7 +70,7 @@ export class WorkspaceStore {
   openVoidDialog(invoice: Invoice): void {
     this.returnToDetailsAfterVoid = this.dialog() === 'details';
     this.invoiceToVoid = invoice;
-    this.voidReason = '';
+    this.voidReason = invoice.status === 'PendingAuthorization' ? invoice.voidReason ?? '' : '';
     this.dialogError.set(null);
     this.dialog.set('void');
   }
@@ -202,19 +206,23 @@ export class WorkspaceStore {
     this.saving.set(true);
     this.dialogError.set(null);
     try {
-      await firstValueFrom(this.api.voidInvoice(this.invoiceToVoid.id, this.voidReason.trim()));
+      const updated = await firstValueFrom(this.api.voidInvoice(this.invoiceToVoid.id, this.voidReason.trim()));
       const invoice = this.invoiceToVoid;
       await this.reloadData();
       this.dialog.set(null);
       this.invoiceToVoid = null;
       if (this.returnToDetailsAfterVoid) {
         this.returnToDetailsAfterVoid = false;
-        this.invoiceDetails.set(this.invoices().find(item => item.id === invoice.id) ?? null);
+        this.invoiceDetails.set(this.invoices().find(item => item.id === invoice.id) ?? updated);
         this.dialog.set('details');
       } else {
         this.invoiceDetails.set(null);
       }
-      this.reportSuccess('Invoice voided', `${invoice.number} was voided. The reason is saved in the invoice record.`);
+      if (updated.status === 'PendingAuthorization') {
+        this.reportSuccess('Cancellation requested', `${invoice.number} is pending Admin or Manager authorization.`);
+      } else {
+        this.reportSuccess('Invoice voided', `${invoice.number} was voided. The reason is saved in the invoice record.`);
+      }
     } catch {
       const message = 'The invoice could not be voided. Refresh and try again.';
       this.dialogError.set(message);

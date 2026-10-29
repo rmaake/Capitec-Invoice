@@ -46,7 +46,7 @@ describe('App login and workspace routes', () => {
       providers: [
         provideHttpClient(),
         provideRouter(routes),
-        { provide: InvoiceApi, useValue: { getAuthSession: () => of({ authenticated: true }) } },
+        { provide: InvoiceApi, useValue: { getAuthSession: () => of({ authenticated: true, roles: ['Admin'] }) } },
         { provide: WorkspaceStore, useValue: storeStub }
       ]
     }).compileComponents();

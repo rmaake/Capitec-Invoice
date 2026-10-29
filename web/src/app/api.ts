@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export type InvoiceStatus = 'Sent' | 'Paid' | 'Void';
+export type InvoiceStatus = 'Sent' | 'Paid' | 'PendingAuthorization' | 'Void';
 export interface Customer { id: number; name: string; email: string; phone: string | null; }
 export interface InvoiceLine { id: number; description: string; quantity: number; unitPrice: number; total: number; }
 export interface Invoice {
@@ -20,7 +20,7 @@ export interface CreateInvoice {
   items: Array<{ description: string; quantity: number; unitPrice: number }>;
 }
 export interface LoginRequest { email: string; password: string; rememberMe: boolean; }
-export interface AuthSession { authenticated: boolean; }
+export interface AuthSession { authenticated: boolean; roles: string[]; }
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceApi {

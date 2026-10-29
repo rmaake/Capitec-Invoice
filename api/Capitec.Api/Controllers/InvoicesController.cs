@@ -5,6 +5,7 @@ using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Capitec.Domain.Constants;
 
 namespace Capitec.Api.Controllers;
 
@@ -98,9 +99,13 @@ public sealed class InvoicesController(IInvoiceService invoices) : ControllerBas
     [HttpPost("{id:int}/void")]
     public async Task<ActionResult<InvoiceDto>> Void(int id, VoidInvoiceRequest request, CancellationToken cancellationToken)
     {
+        var canAuthorize = User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Manager);
+        if (!canAuthorize && !User.IsInRole(Roles.User))
+            return Forbid();
+
         try
         {
-            var invoice = await invoices.VoidAsync(id, request.Reason, cancellationToken);
+            var invoice = await invoices.VoidAsync(id, request.Reason, canAuthorize, cancellationToken);
             return invoice is null ? NotFound() : Ok(invoice);
         }
         catch (ArgumentException exception)

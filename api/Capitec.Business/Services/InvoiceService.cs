@@ -142,7 +142,7 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
         return updated?.ToDto(clock.GetUtcNow().UtcDateTime);
     }
 
-    public async Task<InvoiceDto?> VoidAsync(int id, string reason, CancellationToken cancellationToken)
+    public async Task<InvoiceDto?> VoidAsync(int id, string reason, bool canAuthorize, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(reason))
             throw new ArgumentException("A reason is required to void an invoice.", nameof(reason));
@@ -160,11 +160,18 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
                 return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
             throw new InvalidOperationException("A voided invoice's reason cannot be changed.");
         }
-        if (invoice.StatusId != (int)InvoiceStatus.Sent)
-            throw new InvalidOperationException("Only sent invoices can be voided.");
+        if (invoice.StatusId == (int)InvoiceStatus.PendingAuthorization && !canAuthorize
+            && string.Equals(invoice.VoidReason, normalizedReason, StringComparison.Ordinal))
+            return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
+        if (invoice.StatusId == (int)InvoiceStatus.PendingAuthorization && !canAuthorize)
+            throw new InvalidOperationException("Only an Admin or Manager can authorize a pending cancellation.");
+        if (invoice.StatusId is not ((int)InvoiceStatus.Sent) and not ((int)InvoiceStatus.PendingAuthorization))
+            throw new InvalidOperationException("Only sent or pending-authorization invoices can be cancelled.");
 
-        invoice.StatusId = (int)InvoiceStatus.Void;
-        invoice.VoidReason = normalizedReason;
+        var wasPendingAuthorization = invoice.StatusId == (int)InvoiceStatus.PendingAuthorization;
+        invoice.StatusId = canAuthorize ? (int)InvoiceStatus.Void : (int)InvoiceStatus.PendingAuthorization;
+        if (!wasPendingAuthorization)
+            invoice.VoidReason = normalizedReason;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
     }

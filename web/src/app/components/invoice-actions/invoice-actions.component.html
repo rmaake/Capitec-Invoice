@@ -2,6 +2,8 @@
     <button class="small-action" type="button" (click)="details.emit(invoice())">Details</button>
     @if (invoice().status === 'Sent') {
     <button class="small-action" type="button" (click)="paid.emit(invoice())">Mark paid</button>
-    <button class="small-action danger-action" type="button" (click)="voidRequested.emit(invoice())">Void</button>
+    <button class="small-action danger-action" type="button" (click)="voidRequested.emit(invoice())">{{ canAuthorizeVoid() ? 'Void' : 'Request void' }}</button>
+    } @else if (invoice().status === 'PendingAuthorization' && canAuthorizeVoid()) {
+    <button class="small-action danger-action" type="button" (click)="voidRequested.emit(invoice())">Authorize void</button>
     }
 </div>

@@ -50,9 +50,9 @@ public class InvoiceTests : BaseTest
         var service = new InvoiceService(database.UnitOfWorkFactory, clock);
         var invoice = await service.CreateInvoiceAsync("invoice-void-reason-001", CreateCommand(customer.Id), CancellationToken.None);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => service.VoidAsync(invoice.Id, "  ", CancellationToken.None));
-        var voided = await service.VoidAsync(invoice.Id, "Duplicate invoice", CancellationToken.None);
-        var repeated = await service.VoidAsync(invoice.Id, "Duplicate invoice", CancellationToken.None);
+        await Assert.ThrowsAsync<ArgumentException>(() => service.VoidAsync(invoice.Id, "  ", true, CancellationToken.None));
+        var voided = await service.VoidAsync(invoice.Id, "Duplicate invoice", true, CancellationToken.None);
+        var repeated = await service.VoidAsync(invoice.Id, "Duplicate invoice", true, CancellationToken.None);
 
         Assert.NotNull(voided);
         Assert.Equal(InvoiceStatus.Void, voided.Status);
@@ -69,7 +69,43 @@ public class InvoiceTests : BaseTest
         var invoice = await service.CreateInvoiceAsync("invoice-void-paid-001", CreateCommand(customer.Id), CancellationToken.None);
         await service.MarkPaidAsync(invoice.Id, ValidPaymentProof(), CancellationToken.None);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.VoidAsync(invoice.Id, "Customer dispute", CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.VoidAsync(invoice.Id, "Customer dispute", true, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task UserCancellationWaitsForManagerAuthorization()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var customer = await AddCustomerAsync(database.Context);
+        var service = new InvoiceService(database.UnitOfWorkFactory, new FixedTimeProvider(DateTimeOffset.Parse("2026-10-18T10:00:00Z")));
+        var invoice = await service.CreateInvoiceAsync("invoice-void-approval-001", CreateCommand(customer.Id), CancellationToken.None);
+
+        var request = await service.VoidAsync(invoice.Id, "Incorrect amount", false, CancellationToken.None);
+        var repeatedRequest = await service.VoidAsync(invoice.Id, "Incorrect amount", false, CancellationToken.None);
+
+        Assert.Equal(InvoiceStatus.PendingAuthorization, request!.Status);
+        Assert.Equal(InvoiceStatus.PendingAuthorization, repeatedRequest!.Status);
+        Assert.Equal("Incorrect amount", request.VoidReason);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.VoidAsync(invoice.Id, "Different reason", false, CancellationToken.None));
+
+        var authorized = await service.VoidAsync(invoice.Id, "Approver note", true, CancellationToken.None);
+
+        Assert.Equal(InvoiceStatus.Void, authorized!.Status);
+        Assert.Equal("Incorrect amount", authorized.VoidReason);
+        Assert.Equal("Incorrect amount", authorized.VoidReason);
+    }
+
+    [Fact]
+    public async Task ManagerCanVoidSentInvoiceDirectly()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var customer = await AddCustomerAsync(database.Context);
+        var service = new InvoiceService(database.UnitOfWorkFactory, new FixedTimeProvider(DateTimeOffset.Parse("2026-10-18T10:00:00Z")));
+        var invoice = await service.CreateInvoiceAsync("invoice-void-manager-001", CreateCommand(customer.Id), CancellationToken.None);
+
+        var voided = await service.VoidAsync(invoice.Id, "Duplicate entry", true, CancellationToken.None);
+
+        Assert.Equal(InvoiceStatus.Void, voided!.Status);
     }
 
     [Fact]

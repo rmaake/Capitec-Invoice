@@ -5,6 +5,7 @@ using Capitec.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Capitec.Api.Controllers
 {
@@ -55,7 +56,11 @@ namespace Capitec.Api.Controllers
         [HttpGet("session")]
         public IActionResult Session()
         {
-            return Ok(new { authenticated = User.Identity?.IsAuthenticated == true });
+            return Ok(new
+            {
+                authenticated = User.Identity?.IsAuthenticated == true,
+                roles = User.FindAll(ClaimTypes.Role).Select(claim => claim.Value).Distinct().ToArray()
+            });
         }
 
         [Authorize]
