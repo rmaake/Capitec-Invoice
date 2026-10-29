@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
+import { adminGuard } from './admin.guard';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { WorkspaceShellComponent } from './workspace-shell.component';
 
@@ -15,7 +16,8 @@ export const routes: Routes = [
 			{ path: 'overview', loadComponent: () => import('./pages/overview-page/overview-page.component').then(page => page.OverviewPageComponent), title: 'Overview | Capitec Business Invoicing' },
 			{ path: 'invoices', loadComponent: () => import('./pages/invoices-page/invoices-page.component').then(page => page.InvoicesPageComponent), title: 'Invoices | Capitec Business Invoicing' },
 			{ path: 'customers', loadComponent: () => import('./pages/customers-page/customers-page.component').then(page => page.CustomersPageComponent), title: 'Customers | Capitec Business Invoicing' },
-			{ path: 'reminders', loadComponent: () => import('./pages/reminders-page/reminders-page.component').then(page => page.RemindersPageComponent), title: 'Reminders | Capitec Business Invoicing' }
+			{ path: 'reminders', loadComponent: () => import('./pages/reminders-page/reminders-page.component').then(page => page.RemindersPageComponent), title: 'Reminders | Capitec Business Invoicing' },
+			{ path: 'users', canActivate: [adminGuard], loadComponent: () => import('./pages/users-page/users-page.component').then(page => page.UsersPageComponent), title: 'User management | Capitec Business Invoicing' }
 		]
 	},
 	{ path: '**', redirectTo: 'login' }

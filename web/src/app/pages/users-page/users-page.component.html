@@ -1,0 +1,69 @@
+<app-page-heading title="User management" subtitle="Manage access, roles and account recovery.">
+  <button class="button primary" type="button" (click)="openCreate()"><span aria-hidden="true">＋</span> Add user</button>
+</app-page-heading>
+
+@if (message() && !dialog()) {
+  <div class="user-feedback" [class.user-feedback-error]="messageKind() === 'error'" [attr.role]="messageKind() === 'error' ? 'alert' : 'status'">
+    <span>{{ message() }}</span>
+    <button type="button" aria-label="Dismiss message" (click)="message.set('')">×</button>
+  </div>
+}
+
+<section class="panel full-panel user-panel">
+  <div class="user-toolbar">
+    <div><h2>Team accounts</h2><p>{{ users().length }} active {{ users().length === 1 ? 'user' : 'users' }}</p></div>
+    <label class="search"><span aria-hidden="true">⌕</span><input type="search" [value]="search()" (input)="search.set($any($event.target).value)" placeholder="Search users" aria-label="Search users"></label>
+  </div>
+  @if (loading()) {
+    <div class="empty" role="status">Loading users…</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="user-table">
+        <thead><tr><th>USER</th><th>ROLE</th><th>ACCOUNT</th><th class="user-actions-heading">ACTIONS</th></tr></thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.id) {
+            <tr>
+              <td><div class="user-identity"><span class="user-mark">{{ user.firstName.slice(0, 1).toUpperCase() }}{{ user.lastName.slice(0, 1).toUpperCase() }}</span><span><strong>{{ user.firstName }} {{ user.lastName }}</strong><small>{{ user.email }}</small></span></div></td>
+              <td><span class="user-role" [class.user-role-admin]="user.role === 'Admin'">{{ user.role }}</span></td>
+              <td><span class="user-state" [class.user-state-locked]="user.isLockedOut"><i></i>{{ user.isLockedOut ? 'Locked' : 'Active' }}</span></td>
+              <td><div class="user-actions">
+                <button class="small-action" type="button" (click)="openEdit(user)" [attr.aria-label]="'Edit ' + user.email">Edit</button>
+                <button class="small-action" type="button" (click)="openReset(user)" [attr.aria-label]="'Reset password for ' + user.email">Reset password</button>
+                @if (user.isLockedOut) { <button class="small-action" type="button" (click)="unlock(user)" [attr.aria-label]="'Unlock ' + user.email">Unlock</button> }
+                <button class="small-action destructive-action" type="button" (click)="delete(user)" [attr.aria-label]="'Remove ' + user.email">Remove</button>
+              </div></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4"><div class="empty"><b>No users found</b><p>Adjust your search or add a user account.</p></div></td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (dialog(); as mode) {
+  <div class="user-dialog-backdrop" (click)="closeDialog()">
+    <section class="user-dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="'user-dialog-title'" (click)="$event.stopPropagation()">
+      <header class="user-dialog-heading"><div><p class="eyebrow">ACCOUNT ACCESS</p><h2 id="user-dialog-title">{{ mode === 'create' ? 'Add user' : mode === 'edit' ? 'Edit user' : 'Reset password' }}</h2></div><button class="user-dialog-close" type="button" aria-label="Close dialog" (click)="closeDialog()">×</button></header>
+      @if (message() && messageKind() === 'error') { <p class="user-dialog-error" role="alert">{{ message() }}</p> }
+      <form (ngSubmit)="submitDialog()">
+        @if (mode !== 'reset') {
+          <div class="user-form-grid">
+            <label>First name<input name="firstName" [(ngModel)]="draft.firstName" required autocomplete="given-name"></label>
+            <label>Last name<input name="lastName" [(ngModel)]="draft.lastName" required autocomplete="family-name"></label>
+            <label class="user-form-wide">Email address<input name="email" [(ngModel)]="draft.email" type="email" required autocomplete="email"></label>
+            <label class="user-form-wide">Role<select name="role" [(ngModel)]="draft.role"><option value="User">User</option><option value="Manager">Manager</option><option value="Admin">Admin</option></select></label>
+          </div>
+        }
+        @if (mode === 'create' || mode === 'reset') {
+          <div class="user-form-grid user-password-fields">
+            <label class="user-form-wide">{{ mode === 'create' ? 'Initial password' : 'New password' }}<input name="password" [(ngModel)]="draft.password" type="password" required minlength="8" autocomplete="new-password"></label>
+            <label class="user-form-wide">Confirm password<input name="confirmPassword" [(ngModel)]="draft.confirmPassword" type="password" required minlength="8" autocomplete="new-password"></label>
+          </div>
+        }
+        <footer class="user-dialog-footer"><button class="button secondary" type="button" (click)="closeDialog()" [disabled]="saving()">Cancel</button><button class="button primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : mode === 'reset' ? 'Set password' : mode === 'create' ? 'Create account' : 'Save changes' }}</button></footer>
+      </form>
+    </section>
+  </div>
+}

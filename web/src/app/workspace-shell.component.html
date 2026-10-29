@@ -7,6 +7,9 @@
       <a class="nav-item" routerLink="/invoices" routerLinkActive="active"><span class="nav-icon">▤</span>Invoices <span class="nav-count">{{ store.invoices().length }}</span></a>
       <a class="nav-item" routerLink="/customers" routerLinkActive="active"><span class="nav-icon">♙</span>Customers <span class="nav-count">{{ store.customers().length }}</span></a>
       <a class="nav-item" routerLink="/reminders" routerLinkActive="active"><span class="nav-icon">◷</span>Reminders <span class="nav-count">{{ store.notifications().length }}</span></a>
+      @if (authSession.isAdmin()) {
+        <a class="nav-item" routerLink="/users" routerLinkActive="active"><span class="nav-icon">♙</span>User management</a>
+      }
     </nav>
     <div class="sidebar-spacer"></div>
     <div class="simulation-note"><span class="online-dot"></span><span><strong>Simulation mode</strong><small>No messages are sent</small></span></div>

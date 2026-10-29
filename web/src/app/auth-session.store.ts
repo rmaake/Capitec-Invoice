@@ -11,4 +11,8 @@ export class AuthSessionStore {
   canAuthorizeVoid(): boolean {
     return this.roles().some(role => role === 'Admin' || role === 'Manager');
   }
+
+  isAdmin(): boolean {
+    return this.roles().includes('Admin');
+  }
 }

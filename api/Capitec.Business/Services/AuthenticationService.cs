@@ -40,6 +40,12 @@ namespace Capitec.Business.Services
 
         public async Task<LoginResultDto> LoginAsync(LoginUserCommand request)
         {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user?.IsDeleted == true)
+            {
+                return new LoginResultDto(false, null, "Invalid credentials.");
+            }
+
             var result = await _signInManager.PasswordSignInAsync(
                 request.Email,
                 request.Password,

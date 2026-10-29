@@ -15,9 +15,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddDAL(builder.Configuration);
+builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton(builder.Configuration.GetSection("Notifications").Get<NotificationScheduleOptions>() ?? new NotificationScheduleOptions());
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IOverdueNotificationService, OverdueNotificationService>();

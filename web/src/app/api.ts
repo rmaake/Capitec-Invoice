@@ -21,6 +21,12 @@ export interface CreateInvoice {
 }
 export interface LoginRequest { email: string; password: string; rememberMe: boolean; }
 export interface AuthSession { authenticated: boolean; roles: string[]; }
+export interface ManagedUser {
+  id: string; email: string; firstName: string; lastName: string; role: string; isLockedOut: boolean;
+}
+export interface ManagedUserDraft {
+  email: string; firstName: string; lastName: string; role: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceApi {
@@ -28,6 +34,20 @@ export class InvoiceApi {
   private readonly baseUrl = '/api';
   login(value: LoginRequest): Observable<void> { return this.http.post<void>(`${this.baseUrl}/auth/login`, value); }
   getAuthSession(): Observable<AuthSession> { return this.http.get<AuthSession>(`${this.baseUrl}/auth/session`); }
+  getManagedUsers(): Observable<ManagedUser[]> { return this.http.get<ManagedUser[]>(`${this.baseUrl}/admin/users`); }
+  createManagedUser(value: ManagedUserDraft & { password: string }): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/admin/users`, value);
+  }
+  updateManagedUser(id: string, value: ManagedUserDraft): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/admin/users/${id}`, value);
+  }
+  unlockManagedUser(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/admin/users/${id}/unlock`, {});
+  }
+  resetManagedUserPassword(id: string, password: string, confirmPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/admin/users/${id}/reset-password`, { password, confirmPassword });
+  }
+  deleteManagedUser(id: string): Observable<void> { return this.http.delete<void>(`${this.baseUrl}/admin/users/${id}`); }
   getDashboard(): Observable<Dashboard> { return this.http.get<Dashboard>(`${this.baseUrl}/dashboard`); }
   getCustomers(): Observable<Customer[]> { return this.http.get<Customer[]>(`${this.baseUrl}/customers`); }
   createCustomer(value: { name: string; email: string; phone: string }): Observable<Customer> {
