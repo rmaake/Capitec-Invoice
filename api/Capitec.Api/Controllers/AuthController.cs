@@ -52,6 +52,13 @@ namespace Capitec.Api.Controllers
         }
 
         [Authorize]
+        [HttpGet("session")]
+        public IActionResult Session()
+        {
+            return Ok(new { authenticated = User.Identity?.IsAuthenticated == true });
+        }
+
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

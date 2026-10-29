@@ -2,12 +2,14 @@ using Capitec.Api.Contracts;
 using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.DAL.CustomExceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capitec.Api.Controllers;
 
 [ApiController]
 [Route("api/customers")]
+[Authorize]
 public sealed class CustomersController(ICustomerService customers) : ControllerBase
 {
     [HttpGet]

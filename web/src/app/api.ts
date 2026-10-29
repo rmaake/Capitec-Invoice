@@ -19,11 +19,15 @@ export interface CreateInvoice {
   customerId: number; dueDate: string; currency: 'ZAR'; notes: string;
   items: Array<{ description: string; quantity: number; unitPrice: number }>;
 }
+export interface LoginRequest { email: string; password: string; rememberMe: boolean; }
+export interface AuthSession { authenticated: boolean; }
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api';
+  login(value: LoginRequest): Observable<void> { return this.http.post<void>(`${this.baseUrl}/auth/login`, value); }
+  getAuthSession(): Observable<AuthSession> { return this.http.get<AuthSession>(`${this.baseUrl}/auth/session`); }
   getDashboard(): Observable<Dashboard> { return this.http.get<Dashboard>(`${this.baseUrl}/dashboard`); }
   getCustomers(): Observable<Customer[]> { return this.http.get<Customer[]>(`${this.baseUrl}/customers`); }
   createCustomer(value: { name: string; email: string; phone: string }): Observable<Customer> {

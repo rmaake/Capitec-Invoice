@@ -3,12 +3,14 @@ using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
 using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capitec.Api.Controllers;
 
 [ApiController]
 [Route("api/invoices")]
+[Authorize]
 public sealed class InvoicesController(IInvoiceService invoices) : ControllerBase
 {
     [HttpGet]

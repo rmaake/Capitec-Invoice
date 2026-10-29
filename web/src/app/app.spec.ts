@@ -1,7 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
+import { InvoiceApi } from './api';
 import { App } from './app';
 import { routes } from './app.routes';
 import { WorkspaceStore } from './workspace.store';
@@ -36,24 +39,31 @@ const storeStub = {
   dialogError: signal(null)
 };
 
-describe('App workspace shell and routes', () => {
+describe('App login and workspace routes', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter(routes), { provide: WorkspaceStore, useValue: storeStub }]
+      providers: [
+        provideHttpClient(),
+        provideRouter(routes),
+        { provide: InvoiceApi, useValue: { getAuthSession: () => of({ authenticated: true }) } },
+        { provide: WorkspaceStore, useValue: storeStub }
+      ]
     }).compileComponents();
   });
 
-  it('renders the workspace shell and primary navigation', async () => {
+  it('opens on the login page without rendering the workspace shell', async () => {
     const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+    await router.navigateByUrl('/');
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand-copy strong')?.textContent).toContain('capitec');
-    expect(compiled.querySelectorAll('.nav-item').length).toBe(4);
-    expect(compiled.querySelector('router-outlet')).not.toBeNull();
+    expect(compiled.querySelector('#login-title')?.textContent).toContain('Welcome back');
+    expect(compiled.querySelector('#login-email')).not.toBeNull();
+    expect(compiled.querySelector('.sidebar')).toBeNull();
   });
 
   it('routes each main view to its own page component', async () => {

@@ -1,11 +1,13 @@
 using Capitec.Business.Services.Abstractions;
 using Capitec.Business.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Capitec.Api.Controllers;
 
 [ApiController]
 [Route("api/notifications")]
+[Authorize]
 public sealed class NotificationsController(IOverdueNotificationService simulator) : ControllerBase
 {
     [HttpGet]

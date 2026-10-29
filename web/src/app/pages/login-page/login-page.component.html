@@ -1,0 +1,52 @@
+<main class="login-page">
+  <section class="login-panel" aria-labelledby="login-title">
+    <a class="login-brand" href="/login" aria-label="Capitec Business Invoicing home">
+      <span class="login-brand-mark" aria-hidden="true">C</span>
+      <span><strong>capitec</strong><small>BUSINESS INVOICING</small></span>
+    </a>
+
+    <div class="login-content">
+      <p class="login-eyebrow">YOUR BUSINESS, IN GOOD HANDS</p>
+      <h1 id="login-title">Welcome back</h1>
+      <p class="login-intro">Sign in to your business workspace.</p>
+
+      <form class="login-form" (ngSubmit)="submit()">
+        <label for="login-email">Email address</label>
+        <input id="login-email" name="email" type="email" autocomplete="username" placeholder="name@business.co.za" required [ngModel]="email()" (ngModelChange)="email.set($event)">
+
+        <div class="password-label-row">
+          <label for="login-password">Password</label>
+          <a href="mailto:support@capitecbank.co.za?subject=Password%20assistance">Forgot password?</a>
+        </div>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required [ngModel]="password()" (ngModelChange)="password.set($event)">
+
+        <label class="remember-option"><input type="checkbox" name="rememberMe" [ngModel]="rememberMe()" (ngModelChange)="rememberMe.set($event)"><span>Remember this device</span></label>
+        <button class="login-submit" type="submit" [disabled]="submitting()"><span>{{ submitting() ? 'Signing in…' : 'Sign in' }}</span><span aria-hidden="true">→</span></button>
+        @if (message()) {
+          <p class="login-message" role="alert">{{ message() }}</p>
+        }
+      </form>
+    </div>
+
+    <footer class="login-footer"><span>© Capitec Bank</span><a href="mailto:support@capitecbank.co.za">Need help?</a></footer>
+  </section>
+
+  <aside class="login-art" aria-label="Capitec Business Invoicing">
+    <div class="art-topline"><span>CAPITEC BUSINESS</span><span>01 / FINANCE</span></div>
+    <div class="art-copy"><p>BUSINESS INVOICING</p><h2>Make room<br>for what matters.</h2></div>
+    <div class="art-ledger" aria-hidden="true">
+      <div class="ledger-head"><span>INVOICE</span><span>OCT 2026</span></div>
+      <div class="ledger-number">#INV-2048</div>
+      <div class="ledger-rule"></div>
+      <div class="ledger-row"><span>Creative services</span><span>R 18,500.00</span></div>
+      <div class="ledger-row"><span>Due date</span><span>14 Nov 2026</span></div>
+      <div class="ledger-total"><span>TOTAL DUE</span><strong>R 18,500.00</strong></div>
+      <div class="ledger-stamp">READY TO SEND <span>↗</span></div>
+    </div>
+    <div class="art-bottomline"><span>CLARITY IN EVERY DETAIL</span><span>EST. FOR BUSINESS</span></div>
+  </aside>
+</main>
+
+@if (apiFeedback.loading()) {
+  <div class="api-overlay loading-overlay" role="status" aria-live="polite" aria-label="Waiting for the service"><div class="overlay-panel loading-panel"><span class="loading-spinner" aria-hidden="true"></span><strong>Working</strong><p>Waiting for the service to respond</p></div></div>
+}
