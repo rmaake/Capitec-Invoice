@@ -44,6 +44,7 @@ namespace Capitec.DAL.Persistence.Repository
                 .OrderBy(invoice => invoice.DueAtUtc).Select(invoice => invoice.Id).ToListAsync(cancellationToken);
 
         public void Add(Invoice invoice) => database.Invoices.Add(invoice);
+        public void AddDocument(InvoiceDocument document) => database.InvoiceDocuments.Add(document);
     }
 
 }

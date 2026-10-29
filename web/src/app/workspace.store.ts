@@ -3,7 +3,7 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 import { Customer, CreateInvoice, Dashboard, Invoice, InvoiceApi, Notification } from './api';
 import { ApiFeedbackService, ApiResultKind } from './api-feedback';
 
-export type WorkspaceDialog = 'customer' | 'invoice' | 'details' | 'void' | null;
+export type WorkspaceDialog = 'customer' | 'invoice' | 'details' | 'void' | 'payment-proof' | null;
 
 @Injectable({ providedIn: 'root' })
 export class WorkspaceStore {
@@ -27,10 +27,13 @@ export class WorkspaceStore {
   customerDraft = { name: '', email: '', phone: '' };
   invoiceDraft = this.emptyInvoiceDraft();
   invoiceToVoid: Invoice | null = null;
+  invoiceToPay: Invoice | null = null;
+  paymentProofFile: File | null = null;
   voidReason = '';
   private invoiceIdempotencyKey = globalThis.crypto.randomUUID();
   private customerForInvoice = false;
   private returnToDetailsAfterVoid = false;
+  private returnToDetailsAfterPayment = false;
 
   constructor() { void this.refresh(); }
 
@@ -68,6 +71,19 @@ export class WorkspaceStore {
     this.dialog.set('void');
   }
 
+  openPaymentProofDialog(invoice: Invoice): void {
+    this.returnToDetailsAfterPayment = this.dialog() === 'details';
+    this.invoiceToPay = invoice;
+    this.paymentProofFile = null;
+    this.dialogError.set(null);
+    this.dialog.set('payment-proof');
+  }
+
+  setPaymentProofFile(file: File | null): void {
+    this.paymentProofFile = file;
+    this.dialogError.set(null);
+  }
+
   async openInvoiceDetails(invoice: Invoice): Promise<void> {
     this.invoiceDetails.set(null);
     this.detailsError.set(null);
@@ -89,6 +105,13 @@ export class WorkspaceStore {
 
   closeDialog(): void {
     if (this.saving()) return;
+    if (this.dialog() === 'payment-proof' && this.returnToDetailsAfterPayment) {
+      this.dialog.set('details');
+      this.returnToDetailsAfterPayment = false;
+      this.invoiceToPay = null;
+      this.paymentProofFile = null;
+      return;
+    }
     if (this.dialog() === 'void' && this.returnToDetailsAfterVoid) {
       this.dialog.set('details');
       this.returnToDetailsAfterVoid = false;
@@ -135,15 +158,37 @@ export class WorkspaceStore {
   }
 
   async markPaid(invoice: Invoice): Promise<void> {
+    this.openPaymentProofDialog(invoice);
+  }
+
+  async confirmPayment(): Promise<void> {
+    if (!this.invoiceToPay || !this.paymentProofFile) {
+      this.dialogError.set('Select a proof-of-payment document before continuing.');
+      return;
+    }
+
+    this.saving.set(true);
+    this.dialogError.set(null);
     try {
-      const updated = await firstValueFrom(this.api.setStatus(invoice.id, 'Paid'));
+      const invoice = this.invoiceToPay;
+      const updated = await firstValueFrom(this.api.markPaid(invoice.id, this.paymentProofFile));
       await this.reloadData();
-      if (this.dialog() === 'details' && this.invoiceDetails()?.id === invoice.id) this.invoiceDetails.set(updated);
+      this.invoiceToPay = null;
+      this.paymentProofFile = null;
+      if (this.returnToDetailsAfterPayment) {
+        this.invoiceDetails.set(updated);
+        this.dialog.set('details');
+        this.returnToDetailsAfterPayment = false;
+      } else {
+        this.dialog.set(null);
+      }
       this.reportSuccess('Invoice marked as paid', `${invoice.number} is now paid.`);
     } catch {
-      const message = 'The invoice status could not be updated. Refresh and try again.';
+      const message = 'The payment could not be recorded. Check the proof document and try again.';
       this.dialogError.set(message);
       this.reportFailure('Invoice update failed', message);
+    } finally {
+      this.saving.set(false);
     }
   }
 

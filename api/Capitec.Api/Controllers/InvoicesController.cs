@@ -66,6 +66,35 @@ public sealed class InvoicesController(IInvoiceService invoices) : ControllerBas
         }
     }
 
+    [HttpPost("{id:int}/payment-proof")]
+    [RequestSizeLimit(11 * 1024 * 1024)]
+    public async Task<ActionResult<InvoiceDto>> MarkPaid(int id, [FromForm] IFormFile? proofOfPayment, CancellationToken cancellationToken)
+    {
+        if (proofOfPayment is null || proofOfPayment.Length == 0)
+            return BadRequest(new ProblemDetails { Title = "Proof of payment is required." });
+        if (proofOfPayment.Length > 10 * 1024 * 1024)
+            return BadRequest(new ProblemDetails { Title = "Proof of payment must not exceed 10 MB." });
+
+        await using var content = new MemoryStream();
+        await proofOfPayment.CopyToAsync(content, cancellationToken);
+        try
+        {
+            var invoice = await invoices.MarkPaidAsync(id, new MarkInvoicePaidCommand(
+                proofOfPayment.FileName,
+                proofOfPayment.ContentType,
+                content.ToArray()), cancellationToken);
+            return invoice is null ? NotFound() : Ok(invoice);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new ProblemDetails { Title = exception.Message });
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(new ProblemDetails { Title = exception.Message });
+        }
+    }
+
     [HttpPost("{id:int}/void")]
     public async Task<ActionResult<InvoiceDto>> Void(int id, VoidInvoiceRequest request, CancellationToken cancellationToken)
     {

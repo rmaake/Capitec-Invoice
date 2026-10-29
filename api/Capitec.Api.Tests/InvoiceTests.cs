@@ -1,4 +1,6 @@
 using Capitec.Business.Services;
+using Capitec.Business.Services.Options;
+using Capitec.Business.Contracts;
 using Capitec.DAL.CustomExceptions;
 using Capitec.DAL.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -65,9 +67,43 @@ public class InvoiceTests : BaseTest
         var customer = await AddCustomerAsync(database.Context);
         var service = new InvoiceService(database.UnitOfWorkFactory, new FixedTimeProvider(DateTimeOffset.Parse("2026-10-18T10:00:00Z")));
         var invoice = await service.CreateInvoiceAsync("invoice-void-paid-001", CreateCommand(customer.Id), CancellationToken.None);
-        await service.SetStatusAsync(invoice.Id, InvoiceStatus.Paid, CancellationToken.None);
+        await service.MarkPaidAsync(invoice.Id, ValidPaymentProof(), CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => service.VoidAsync(invoice.Id, "Customer dispute", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task MarkingInvoicePaidPersistsProofAndStatusTogether()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var customer = await AddCustomerAsync(database.Context);
+        var service = new InvoiceService(database.UnitOfWorkFactory, new FixedTimeProvider(DateTimeOffset.Parse("2026-10-18T10:00:00Z")));
+        var invoice = await service.CreateInvoiceAsync("invoice-paid-proof-001", CreateCommand(customer.Id), CancellationToken.None);
+
+        var paid = await service.MarkPaidAsync(invoice.Id, ValidPaymentProof(), CancellationToken.None);
+        var document = await database.Context.InvoiceDocuments.SingleAsync();
+
+        Assert.Equal(InvoiceStatus.Paid, paid!.Status);
+        Assert.Equal(invoice.Id, document.InvoiceId);
+        Assert.Equal("receipt.pdf", document.FileName);
+        Assert.Equal("application/pdf", document.ContentType);
+        Assert.Equal("%PDF-1.4 proof"u8.ToArray(), document.Content);
+    }
+
+    [Fact]
+    public async Task PaidStatusCannotBeSetWithoutProofOfPayment()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        var customer = await AddCustomerAsync(database.Context);
+        var service = new InvoiceService(database.UnitOfWorkFactory, new FixedTimeProvider(DateTimeOffset.Parse("2026-10-18T10:00:00Z")));
+        var invoice = await service.CreateInvoiceAsync("invoice-paid-proof-002", CreateCommand(customer.Id), CancellationToken.None);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.SetStatusAsync(invoice.Id, InvoiceStatus.Paid, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentException>(() => service.MarkPaidAsync(invoice.Id,
+            new MarkInvoicePaidCommand("receipt.pdf", "application/pdf", "not a pdf"u8.ToArray()), CancellationToken.None));
+
+        Assert.Equal(0, await database.Context.InvoiceDocuments.CountAsync());
+        Assert.Equal((int)InvoiceStatus.Sent, await database.Context.Invoices.Where(item => item.Id == invoice.Id).Select(item => item.StatusId).SingleAsync());
     }
 
     [Fact]
@@ -88,4 +124,7 @@ public class InvoiceTests : BaseTest
         Assert.Single(reminders);
         Assert.Equal(invoice.Id, reminders[0].InvoiceId);
     }
+
+    private static MarkInvoicePaidCommand ValidPaymentProof() =>
+        new("receipt.pdf", "application/pdf", "%PDF-1.4 proof"u8.ToArray());
 }

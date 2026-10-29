@@ -195,6 +195,39 @@ namespace Capitec.DAL.Migrations
                     b.ToTable("Invoices");
                 });
 
+            modelBuilder.Entity("Capitec.DAL.Data.Entities.InvoiceDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("InvoiceDocuments");
+                });
+
             modelBuilder.Entity("Capitec.DAL.Data.Entities.InvoiceLineItem", b =>
                 {
                     b.Property<int>("Id")
@@ -488,6 +521,17 @@ namespace Capitec.DAL.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("Capitec.DAL.Data.Entities.InvoiceDocument", b =>
+                {
+                    b.HasOne("Capitec.DAL.Data.Entities.Invoice", "Invoice")
+                        .WithMany("Documents")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+                });
+
             modelBuilder.Entity("Capitec.DAL.Data.Entities.InvoiceLineItem", b =>
                 {
                     b.HasOne("Capitec.DAL.Data.Entities.Invoice", "Invoice")
@@ -568,6 +612,8 @@ namespace Capitec.DAL.Migrations
 
             modelBuilder.Entity("Capitec.DAL.Data.Entities.Invoice", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("IdempotencyRecords");
 
                     b.Navigation("Items");

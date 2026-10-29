@@ -1021,6 +1021,16 @@ td small {
 }
 .line-heading strong {
     color: #48554d;
+.form input[type="file"] {
+    min-height: 41px;
+    height: auto;
+    padding: 6px;
+    border: 1px dashed #cbd6ce;
+    border-radius: 4px;
+    color: #57645b;
+    background: #f8faf8;
+    font-size: 10px;
+}
     font-size: 9px;
 }
 .line-row {
@@ -1028,6 +1038,11 @@ td small {
     grid-template-columns: minmax(110px, 1fr) 58px 95px 24px;
     align-items: end;
     gap: 7px;
+.selected-proof {
+    overflow-wrap: anywhere;
+    color: #356e4d;
+    font-weight: 600;
+}
 }
 .line-row label {
     font-size: 8px;

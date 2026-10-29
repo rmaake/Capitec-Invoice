@@ -21,6 +21,7 @@ public sealed class Invoice
     public Currency Currency { get; set; }
     public InvoiceStatus Status { get; set; }
     public ICollection<InvoiceLineItem> Items { get; set; } = new List<InvoiceLineItem>();
+    public ICollection<InvoiceDocument> Documents { get; set; } = new List<InvoiceDocument>();
     public ICollection<SimulatedNotification> Notifications { get; set; } = new List<SimulatedNotification>();
     public ICollection<IdempotencyRecord> IdempotencyRecords { get; set; } = new List<IdempotencyRecord>();
     public decimal Total => Items.Sum(item => item.Quantity * item.UnitPrice);

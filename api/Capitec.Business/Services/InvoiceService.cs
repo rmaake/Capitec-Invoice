@@ -13,6 +13,8 @@ namespace Capitec.Business.Services;
 
 public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimeProvider clock) : IInvoiceService
 {
+    private const int MaxPaymentProofSize = 10 * 1024 * 1024;
+
     public async Task<IReadOnlyList<InvoiceDto>> GetInvoicesAsync(string? search, InvoiceStatus? status, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
@@ -96,6 +98,8 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
     {
         if (status == InvoiceStatus.Void)
             throw new InvalidOperationException("Use the void operation and provide a reason.");
+        if (status == InvoiceStatus.Paid)
+            throw new InvalidOperationException("Upload proof of payment to mark this invoice as paid.");
 
         await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
         var invoice = await unitOfWork.Invoices.GetForUpdateAsync(id, cancellationToken);
@@ -108,6 +112,34 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
         invoice.StatusId = (int)status;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return invoice.ToDto(clock.GetUtcNow().UtcDateTime);
+    }
+
+    public async Task<InvoiceDto?> MarkPaidAsync(int id, MarkInvoicePaidCommand command, CancellationToken cancellationToken)
+    {
+        ValidatePaymentProof(command);
+
+        await using var unitOfWork = await unitOfWorkFactory.CreateAsync(cancellationToken);
+        var invoice = await unitOfWork.Invoices.GetForUpdateAsync(id, cancellationToken);
+        if (invoice is null)
+            return null;
+        if (invoice.StatusId != (int)InvoiceStatus.Sent)
+            throw new InvalidOperationException("Only sent invoices can be marked as paid.");
+
+        await using var transaction = await unitOfWork.BeginTransactionAsync(cancellationToken);
+        invoice.StatusId = (int)InvoiceStatus.Paid;
+        unitOfWork.Invoices.AddDocument(new InvoiceDocument
+        {
+            InvoiceId = invoice.Id,
+            FileName = Path.GetFileName(command.FileName),
+            ContentType = command.ContentType,
+            Content = command.Content,
+            UploadedAtUtc = clock.GetUtcNow().UtcDateTime
+        });
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        var updated = await unitOfWork.Invoices.GetByIdAsync(id, cancellationToken);
+        return updated?.ToDto(clock.GetUtcNow().UtcDateTime);
     }
 
     public async Task<InvoiceDto?> VoidAsync(int id, string reason, CancellationToken cancellationToken)
@@ -145,6 +177,27 @@ public sealed class InvoiceService(IUnitOfWorkFactory unitOfWorkFactory, TimePro
             throw new ArgumentException("Invoices require valid line items.", nameof(command));
         if (command.Currency != Currency.ZAR)
             throw new ArgumentException("Only ZAR invoices are currently supported.", nameof(command));
+    }
+
+    private static void ValidatePaymentProof(MarkInvoicePaidCommand command)
+    {
+        if (command.Content.Length == 0 || command.Content.Length > MaxPaymentProofSize)
+            throw new ArgumentException("Proof of payment must be between 1 byte and 10 MB.", nameof(command));
+
+        var extension = Path.GetExtension(command.FileName).ToLowerInvariant();
+        var validContent = extension switch
+        {
+            ".pdf" => command.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase)
+                && command.Content.AsSpan().StartsWith("%PDF-"u8),
+            ".png" => command.ContentType.Equals("image/png", StringComparison.OrdinalIgnoreCase)
+                && command.Content.AsSpan().StartsWith(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }),
+            ".jpg" or ".jpeg" => command.ContentType.Equals("image/jpeg", StringComparison.OrdinalIgnoreCase)
+                && command.Content.Length >= 3 && command.Content[0] == 0xff && command.Content[1] == 0xd8 && command.Content[2] == 0xff,
+            _ => false
+        };
+
+        if (!validContent)
+            throw new ArgumentException("Upload a valid PDF, PNG, or JPEG proof of payment.", nameof(command));
     }
 
     private static InvoiceDto EnsureSameRequest(IdempotencyRecord existing, string requestHash, DateTime nowUtc)

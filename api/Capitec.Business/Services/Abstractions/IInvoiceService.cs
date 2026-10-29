@@ -9,6 +9,7 @@ namespace Capitec.Business.Services.Abstractions
         Task<InvoiceDto?> GetInvoiceAsync(int id, CancellationToken cancellationToken);
         Task<InvoiceDto> CreateInvoiceAsync(string idempotencyKey, CreateInvoiceCommand command, CancellationToken cancellationToken);
         Task<InvoiceDto?> SetStatusAsync(int id, InvoiceStatus status, CancellationToken cancellationToken);
+        Task<InvoiceDto?> MarkPaidAsync(int id, MarkInvoicePaidCommand command, CancellationToken cancellationToken);
         Task<InvoiceDto?> VoidAsync(int id, string reason, CancellationToken cancellationToken);
     }
 }

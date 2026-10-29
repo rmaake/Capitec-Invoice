@@ -12,5 +12,6 @@ namespace Capitec.DAL.Persistence.Abstractions
         Task<IReadOnlyList<Invoice>> GetForDashboardAsync(CancellationToken cancellationToken);
         Task<IReadOnlyList<int>> GetOverdueIdsAsync(DateTime beforeUtc, CancellationToken cancellationToken);
         void Add(Invoice invoice);
+        void AddDocument(InvoiceDocument document);
     }
 }

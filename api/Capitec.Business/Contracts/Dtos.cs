@@ -9,6 +9,7 @@ public sealed record LoginResultDto(bool Success, string? Token, string? ErrorMe
 public sealed record CreateCustomerCommand(string Name, string Email, string? Phone);
 public sealed record CreateInvoiceLineCommand(string Description, decimal Quantity, decimal UnitPrice);
 public sealed record CreateInvoiceCommand(int CustomerId, DateOnly DueDate, Currency Currency, string? Notes, IReadOnlyList<CreateInvoiceLineCommand> Items);
+public sealed record MarkInvoicePaidCommand(string FileName, string ContentType, byte[] Content);
 
 
 public sealed record CustomerDto(int Id, string Name, string Email, string? Phone);

@@ -41,6 +41,11 @@ export class InvoiceApi {
   setStatus(id: number, status: InvoiceStatus): Observable<Invoice> {
     return this.http.put<Invoice>(`${this.baseUrl}/invoices/${id}/status`, { status });
   }
+  markPaid(id: number, proofOfPayment: File): Observable<Invoice> {
+    const formData = new FormData();
+    formData.append('proofOfPayment', proofOfPayment, proofOfPayment.name);
+    return this.http.post<Invoice>(`${this.baseUrl}/invoices/${id}/payment-proof`, formData);
+  }
   voidInvoice(id: number, reason: string): Observable<Invoice> {
     return this.http.post<Invoice>(`${this.baseUrl}/invoices/${id}/void`, { reason });
   }

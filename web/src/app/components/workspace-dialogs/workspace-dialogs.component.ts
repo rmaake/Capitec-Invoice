@@ -14,4 +14,7 @@ export class WorkspaceDialogsComponent {
   get draftTotal(): number { return this.store.invoiceDraft.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0); }
   addLine(): void { this.store.invoiceDraft.items.push({ description: '', quantity: 1, unitPrice: 0 }); }
   removeLine(index: number): void { if (this.store.invoiceDraft.items.length > 1) this.store.invoiceDraft.items.splice(index, 1); }
+  onProofSelected(event: Event): void {
+    this.store.setPaymentProofFile((event.target as HTMLInputElement).files?.[0] ?? null);
+  }
 }

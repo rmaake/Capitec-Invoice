@@ -35,6 +35,19 @@
     </section></div>
 }
 
+@if (store.dialog() === 'payment-proof' && store.invoiceToPay) {
+<div class="backdrop" role="presentation" (click)="store.closeDialog()"><section class="modal payment-proof-modal" role="dialog" aria-modal="true" aria-labelledby="payment-proof-title" (click)="$event.stopPropagation()">
+        <header class="modal-heading"><div><p class="eyebrow">PAYMENT RECORD</p><h2 id="payment-proof-title">Confirm payment</h2><p>{{ store.invoiceToPay.number }} · {{ store.invoiceToPay.customerName }}</p></div><button class="close" type="button" (click)="store.closeDialog()" aria-label="Close dialog">×</button></header>
+        <form class="form" (ngSubmit)="store.confirmPayment()">
+            <label>Proof of payment <small>REQUIRED</small><input type="file" name="proofOfPayment" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" (change)="onProofSelected($event)" aria-describedby="proof-hint" required></label>
+            <p id="proof-hint" class="upload-hint">PDF, PNG, or JPEG · Maximum 10 MB</p>
+            @if (store.paymentProofFile) { <p class="selected-proof" role="status">Selected: {{ store.paymentProofFile.name }}</p> }
+            @if (store.dialogError()) { <p class="form-error" role="alert">{{ store.dialogError() }}</p> }
+            <div class="modal-actions"><button type="button" class="button secondary" (click)="store.closeDialog()">Cancel</button><button type="submit" class="button primary" [disabled]="!store.paymentProofFile || store.saving()">{{ store.saving() ? 'Saving payment…' : 'Upload and mark paid' }}</button></div>
+        </form>
+    </section></div>
+}
+
 @if (store.dialog() === 'void' && store.invoiceToVoid) {
 <div class="backdrop" role="presentation" (click)="store.closeDialog()"><section class="modal void-modal" role="dialog" aria-modal="true" aria-labelledby="void-title" (click)="$event.stopPropagation()">
         <header class="modal-heading"><div><p class="eyebrow">INVOICE CANCELLATION</p><h2 id="void-title">Void {{ store.invoiceToVoid.number }}?</h2><p>This action is recorded and cannot be undone.</p></div><button class="close" type="button" (click)="store.closeDialog()" aria-label="Close dialog">×</button></header>

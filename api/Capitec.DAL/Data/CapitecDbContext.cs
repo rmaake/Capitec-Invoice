@@ -18,6 +18,7 @@ public sealed class CapitecDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceLineItem> InvoiceLineItems => Set<InvoiceLineItem>();
+    public DbSet<InvoiceDocument> InvoiceDocuments => Set<InvoiceDocument>();
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
     public DbSet<SimulatedNotification> SimulatedNotifications => Set<SimulatedNotification>();
     public DbSet<Entities.Misc.InvoiceStatus> InvoiceStatuses => Set<Entities.Misc.InvoiceStatus>();
