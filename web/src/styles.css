@@ -322,16 +322,26 @@ textarea:focus-visible {
     box-shadow: 0 0 0 3px #315143;
 }
 .profile {
-    display: flex;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-rows: repeat(2, minmax(14px, auto));
     align-items: center;
-    gap: 9px;
+    gap: 3px 9px;
     min-width: 0;
     border-top: 1px solid #35403b;
     padding: 15px 4px 0;
 }
+.profile > .avatar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
 .profile-copy {
+    grid-column: 2;
+    grid-row: 1 / span 2;
     min-width: 0;
-    flex: 1;
+    display: grid;
+    align-content: center;
+    gap: 4px;
 }
 .profile-copy strong,
 .profile-copy small {
@@ -341,7 +351,9 @@ textarea:focus-visible {
 }
 .profile-signout {
     min-width: 29px;
-    height: 30px;
+    height: 100%;
+    grid-column: 3;
+    grid-row: 1 / span 2;
     padding: 0 6px;
     display: inline-flex;
     align-items: center;
@@ -1952,7 +1964,7 @@ td small {
     .brand-copy,
     .nav-label,
     .simulation-note span:last-child,
-    .profile span:last-child {
+    .profile-copy {
         display: none;
     }
     .nav-list {
@@ -1979,7 +1991,26 @@ td small {
         padding: 0;
     }
     .profile {
-        justify-content: center;
+        width: 100%;
+        grid-template-columns: 1fr;
+        grid-template-rows: 30px 30px;
+        justify-items: center;
+        gap: 5px;
+    }
+    .profile > .avatar {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .profile-signout {
+        width: 30px;
+        min-width: 30px;
+        height: 30px;
+        grid-column: 1;
+        grid-row: 2;
+        padding: 0;
+    }
+    .profile-signout > span:last-child {
+        display: none;
     }
     .overview-grid {
         grid-template-columns: 1fr;
